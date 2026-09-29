@@ -33,5 +33,5 @@ public class Contrat {
     private Reservation reservation;
 
     @OneToMany(mappedBy = "contrat", fetch = FetchType.LAZY)
-    private List<Paiement> paiements;
+    private List<Paiement> paiementss;
 }
