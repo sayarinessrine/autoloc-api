@@ -1,5 +1,6 @@
 package com.autoloc.api.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
@@ -12,7 +13,6 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
-
 public class Vehicule {
 
     @Id
@@ -44,6 +44,7 @@ public class Vehicule {
     @JoinColumn(name = "id_agence", nullable = false)
     private Agence agence;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "vehicule", fetch = FetchType.LAZY)
     private List<Maintenance> maintenances;
 
@@ -55,6 +56,7 @@ public class Vehicule {
     )
     private List<Equipement> equipements;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "vehicule", fetch = FetchType.LAZY)
     private List<Reservation> reservations;
 }

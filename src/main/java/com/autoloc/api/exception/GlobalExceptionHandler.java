@@ -1,0 +1,47 @@
+package com.autoloc.api.exception;
+
+import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+import java.time.LocalDateTime;
+
+/**
+ * Principe SRP : la gestion des erreurs est centralisée ici,
+ * les controllers et les services ne s'en occupent pas.
+ */
+@RestControllerAdvice
+public class GlobalExceptionHandler {
+
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleNotFound(ResourceNotFoundException ex, HttpServletRequest request) {
+        return build(HttpStatus.NOT_FOUND, ex.getMessage(), request);
+    }
+
+    @ExceptionHandler(BadRequestException.class)
+    public ResponseEntity<ErrorResponse> handleBadRequest(BadRequestException ex, HttpServletRequest request) {
+        return build(HttpStatus.BAD_REQUEST, ex.getMessage(), request);
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<ErrorResponse> handleUnreadable(HttpMessageNotReadableException ex, HttpServletRequest request) {
+        return build(HttpStatus.BAD_REQUEST,
+                "Corps de la requête invalide (JSON mal formé ou valeur d'énumération incorrecte)", request);
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<ErrorResponse> handleConflict(DataIntegrityViolationException ex, HttpServletRequest request) {
+        return build(HttpStatus.CONFLICT,
+                "Opération impossible : doublon sur un champ unique ou élément encore référencé ailleurs", request);
+    }
+
+    private ResponseEntity<ErrorResponse> build(HttpStatus status, String message, HttpServletRequest request) {
+        ErrorResponse body = new ErrorResponse(
+                LocalDateTime.now(), status.value(), status.getReasonPhrase(), message, request.getRequestURI());
+        return ResponseEntity.status(status).body(body);
+    }
+}

@@ -1,5 +1,6 @@
 package com.autoloc.api.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -10,7 +11,6 @@ import java.time.LocalDate;
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
 public class Reservation {
 
     @Id
@@ -35,6 +35,7 @@ public class Reservation {
     @JoinColumn(name = "id_client", nullable = false)
     private Client client;
 
+    @JsonIgnore
     @OneToOne(mappedBy = "reservation", fetch = FetchType.LAZY)
     private Contrat contrat;
 }
