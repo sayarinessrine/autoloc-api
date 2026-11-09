@@ -36,7 +36,6 @@ public class EmployeController {
     @PostMapping
     @Operation(summary = "Créer : Employé")
     @ApiResponse(responseCode = "400", description = "Données invalides")
-    @ApiResponse(responseCode = "409", description = "Doublon sur un champ unique")
     public Employe create(@RequestBody Employe employe) {
         return employeService.create(employe);
     }
@@ -51,8 +50,24 @@ public class EmployeController {
     @DeleteMapping("/{id}")
     @Operation(summary = "Supprimer : Employé")
     @ApiResponse(responseCode = "404", description = "Employé introuvable")
-    @ApiResponse(responseCode = "409", description = "Élément encore référencé ailleurs")
     public void delete(@PathVariable Long id) {
         employeService.delete(id);
+    }
+
+    @PutMapping("/{idEmploye}/affecter/{idAgence}")
+    @Operation(summary = "Affecter un employé à une agence",
+            description = "L'employé ne doit appartenir à aucune agence : en cas de transfert, le désaffecter d'abord.")
+    @ApiResponse(responseCode = "400", description = "Employé déjà affecté à une agence")
+    @ApiResponse(responseCode = "404", description = "Employé ou agence introuvable")
+    public Employe affecterEmploye(@PathVariable Long idEmploye, @PathVariable Long idAgence) {
+        return employeService.affecterEmploye(idEmploye, idAgence);
+    }
+
+    @PutMapping("/{idEmploye}/desaffecter")
+    @Operation(summary = "Désaffecter un employé de son agence")
+    @ApiResponse(responseCode = "400", description = "Employé déjà sans agence")
+    @ApiResponse(responseCode = "404", description = "Employé introuvable")
+    public Employe desaffecterEmploye(@PathVariable Long idEmploye) {
+        return employeService.desaffecterEmploye(idEmploye);
     }
 }

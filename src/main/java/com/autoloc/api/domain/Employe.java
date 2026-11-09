@@ -1,14 +1,15 @@
 package com.autoloc.api.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
 
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 @Entity
 @Table(name = "employe")
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
 public class Employe {
 
     @Id
@@ -25,7 +26,9 @@ public class Employe {
     @Column(nullable = false, length = 20)
     private RoleEmploye role;
 
+    // Facultatif : un employé peut être désaffecté (agence = null)
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_agence", nullable = false)
+    @JoinColumn(name = "id_agence")
     private Agence agence;
 }

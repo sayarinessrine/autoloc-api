@@ -36,7 +36,7 @@ public class VehiculeController {
     @PostMapping
     @Operation(summary = "Créer : Véhicule")
     @ApiResponse(responseCode = "400", description = "Données invalides")
-    @ApiResponse(responseCode = "409", description = "Doublon sur un champ unique")
+    @ApiResponse(responseCode = "409", description = "Immatriculation déjà existante")
     public Vehicule create(@RequestBody Vehicule vehicule) {
         return vehiculeService.create(vehicule);
     }
@@ -51,8 +51,31 @@ public class VehiculeController {
     @DeleteMapping("/{id}")
     @Operation(summary = "Supprimer : Véhicule")
     @ApiResponse(responseCode = "404", description = "Véhicule introuvable")
-    @ApiResponse(responseCode = "409", description = "Élément encore référencé ailleurs")
+    @ApiResponse(responseCode = "409", description = "Véhicule encore référencé ailleurs")
     public void delete(@PathVariable Long id) {
         vehiculeService.delete(id);
+    }
+
+    @PutMapping("/{idVehicule}/affecter/{idAgence}")
+    @Operation(summary = "Affecter un véhicule à une agence")
+    @ApiResponse(responseCode = "404", description = "Véhicule ou agence introuvable")
+    public Vehicule affecterVehicule(@PathVariable Long idVehicule, @PathVariable Long idAgence) {
+        return vehiculeService.affecterVehicule(idVehicule, idAgence);
+    }
+
+    @PutMapping("/{idVehicule}/affecter-equipement/{idEquipement}")
+    @Operation(summary = "Affecter un équipement à un véhicule")
+    @ApiResponse(responseCode = "400", description = "Équipement déjà installé sur ce véhicule")
+    @ApiResponse(responseCode = "404", description = "Véhicule ou équipement introuvable")
+    public Vehicule affecterEquipement(@PathVariable Long idVehicule, @PathVariable Long idEquipement) {
+        return vehiculeService.affecterEquipement(idVehicule, idEquipement);
+    }
+
+    @PutMapping("/{idVehicule}/desaffecter-equipement/{idEquipement}")
+    @Operation(summary = "Désaffecter un équipement d'un véhicule")
+    @ApiResponse(responseCode = "400", description = "Équipement non installé sur ce véhicule")
+    @ApiResponse(responseCode = "404", description = "Véhicule ou équipement introuvable")
+    public Vehicule desaffecterEquipement(@PathVariable Long idVehicule, @PathVariable Long idEquipement) {
+        return vehiculeService.desaffecterEquipement(idVehicule, idEquipement);
     }
 }
