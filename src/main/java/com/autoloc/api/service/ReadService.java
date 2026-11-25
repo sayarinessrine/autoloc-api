@@ -2,10 +2,10 @@ package com.autoloc.api.service;
 
 import java.util.List;
 
-/** Principe ISP : interface réduite aux opérations de lecture. */
-public interface ReadService<T, ID> {
+/** Principe ISP : opérations de lecture, qui renvoient des DTO. */
+public interface ReadService<D, ID> {
 
-    List<T> getAll();
+    List<D> getAll();
 
-    T getById(ID id);
+    D getById(ID id);
 }

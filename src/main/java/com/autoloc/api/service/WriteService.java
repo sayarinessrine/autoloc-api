@@ -1,11 +1,11 @@
 package com.autoloc.api.service;
 
-/** Principe ISP : interface réduite aux opérations d'écriture. */
-public interface WriteService<T, ID> {
+/** Principe ISP : opérations d'écriture. L'entrée est l'entité, la sortie est un DTO. */
+public interface WriteService<T, D, ID> {
 
-    T create(T entity);
+    D create(T entity);
 
-    T update(ID id, T entity);
+    D update(ID id, T entity);
 
     void delete(ID id);
 }

@@ -1,27 +1,34 @@
 package com.autoloc.api.service;
 
 import com.autoloc.api.exception.ResourceNotFoundException;
+import com.autoloc.api.mapper.EntityMapper;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 /**
- * Implémentation générique du CRUD (principe DRY).
+ * CRUD générique. Les réponses sont toujours converties en DTO par le mapper
+ * à l'intérieur de la transaction (les relations LAZY sont donc chargées au bon moment).
  *
- * OCP : le code est fermé à la modification mais ouvert à l'extension :
- * une sous-classe ajoute ses règles métier en redéfinissant validate().
- * LSP : toutes les sous-classes respectent le contrat de CrudService.
- * DIP : dépend de l'abstraction JpaRepository, pas d'une classe concrète.
+ * OCP : les sous-classes ajoutent leurs règles via validate().
+ * DIP : dépend des abstractions JpaRepository et EntityMapper.
  */
 @Transactional(readOnly = true)
-public abstract class AbstractCrudService<T, ID> implements CrudService<T, ID> {
+public abstract class AbstractCrudService<T, D, ID> implements CrudService<T, D, ID> {
+
+    @PersistenceContext
+    private EntityManager entityManager;
 
     private final JpaRepository<T, ID> repository;
+    private final EntityMapper<T, D> mapper;
     private final String entityName;
 
-    protected AbstractCrudService(JpaRepository<T, ID> repository, String entityName) {
+    protected AbstractCrudService(JpaRepository<T, ID> repository, EntityMapper<T, D> mapper, String entityName) {
         this.repository = repository;
+        this.mapper = mapper;
         this.entityName = entityName;
     }
 
@@ -32,38 +39,56 @@ public abstract class AbstractCrudService<T, ID> implements CrudService<T, ID> {
     protected void validate(T entity) {
     }
 
-    @Override
-    public List<T> getAll() {
-        return repository.findAll();
+    /** Conversion Entité -> DTO, déléguée au mapper. */
+    protected D toDto(T entity) {
+        return mapper.toDto(entity);
     }
 
     @Override
-    public T getById(ID id) {
+    public List<D> getAll() {
+        return repository.findAll().stream().map(this::toDto).toList();
+    }
+
+    @Override
+    public D getById(ID id) {
+        return toDto(findEntityById(id));
+    }
+
+    @Override
+    public T findEntityById(ID id) {
         return repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(entityName + " introuvable avec l'id " + id));
     }
 
     @Override
     @Transactional
-    public T create(T entity) {
+    public D create(T entity) {
         validate(entity);
         assignId(entity, null);
-        return repository.save(entity);
+        return toDto(saveAndRefresh(entity));
     }
 
     @Override
     @Transactional
-    public T update(ID id, T entity) {
-        getById(id);
+    public D update(ID id, T entity) {
+        findEntityById(id);
         validate(entity);
         assignId(entity, id);
-        return repository.save(entity);
+        return toDto(saveAndRefresh(entity));
     }
 
     @Override
     @Transactional
     public void delete(ID id) {
-        getById(id);
+        findEntityById(id);
         repository.deleteById(id);
+    }
+
+    /** Enregistre puis recharge l'entité : les relations (agence, client...) sont complètes pour le mapper. */
+    private T saveAndRefresh(T entity) {
+        T saved = repository.save(entity);
+        entityManager.flush();
+        entityManager.refresh(saved);
+        return saved;
     }
 }

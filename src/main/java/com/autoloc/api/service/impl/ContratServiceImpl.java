@@ -1,7 +1,9 @@
 package com.autoloc.api.service.impl;
 
 import com.autoloc.api.domain.Contrat;
+import com.autoloc.api.dto.ContratDTO;
 import com.autoloc.api.exception.BadRequestException;
+import com.autoloc.api.mapper.ContratMapper;
 import com.autoloc.api.repository.ContratRepository;
 import com.autoloc.api.service.AbstractCrudService;
 import com.autoloc.api.service.ContratService;
@@ -9,10 +11,10 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 
 @Service
-public class ContratServiceImpl extends AbstractCrudService<Contrat, Long> implements ContratService {
+public class ContratServiceImpl extends AbstractCrudService<Contrat, ContratDTO, Long> implements ContratService {
 
-    public ContratServiceImpl(ContratRepository contratRepository) {
-        super(contratRepository, "Contrat");
+    public ContratServiceImpl(ContratRepository contratRepository, ContratMapper contratMapper) {
+        super(contratRepository, contratMapper, "Contrat");
     }
 
     @Override

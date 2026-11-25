@@ -1,17 +1,19 @@
 package com.autoloc.api.service.impl;
 
 import com.autoloc.api.domain.Reservation;
+import com.autoloc.api.dto.ReservationDTO;
 import com.autoloc.api.exception.BadRequestException;
+import com.autoloc.api.mapper.ReservationMapper;
 import com.autoloc.api.repository.ReservationRepository;
 import com.autoloc.api.service.AbstractCrudService;
 import com.autoloc.api.service.ReservationService;
 import org.springframework.stereotype.Service;
 
 @Service
-public class ReservationServiceImpl extends AbstractCrudService<Reservation, Long> implements ReservationService {
+public class ReservationServiceImpl extends AbstractCrudService<Reservation, ReservationDTO, Long> implements ReservationService {
 
-    public ReservationServiceImpl(ReservationRepository reservationRepository) {
-        super(reservationRepository, "Réservation");
+    public ReservationServiceImpl(ReservationRepository reservationRepository, ReservationMapper reservationMapper) {
+        super(reservationRepository, reservationMapper, "Réservation");
     }
 
     @Override

@@ -1,8 +1,12 @@
 package com.autoloc.api.web.controller;
 
 import com.autoloc.api.domain.Paiement;
+import com.autoloc.api.dto.PaiementDTO;
+import com.autoloc.api.exception.ErrorResponse;
 import com.autoloc.api.service.PaiementService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.*;
@@ -22,36 +26,46 @@ public class PaiementController {
 
     @GetMapping
     @Operation(summary = "Lister : Paiement")
-    public List<Paiement> getAll() {
+    public List<PaiementDTO> getAll() {
         return paiementService.getAll();
     }
 
     @GetMapping("/{id}")
     @Operation(summary = "Consulter : Paiement par identifiant")
-    @ApiResponse(responseCode = "404", description = "Paiement introuvable")
-    public Paiement getById(@PathVariable Long id) {
+    @ApiResponse(responseCode = "200", description = "Paiement trouvé(e)")
+    @ApiResponse(responseCode = "404", description = "Paiement introuvable",
+            content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    public PaiementDTO getById(@PathVariable Long id) {
         return paiementService.getById(id);
     }
 
     @PostMapping
     @Operation(summary = "Créer : Paiement")
-    @ApiResponse(responseCode = "400", description = "Données invalides")
-    @ApiResponse(responseCode = "409", description = "Doublon sur un champ unique")
-    public Paiement create(@RequestBody Paiement paiement) {
+    @ApiResponse(responseCode = "200", description = "Paiement créé(e)")
+    @ApiResponse(responseCode = "400", description = "Données invalides",
+            content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    @ApiResponse(responseCode = "409", description = "Doublon sur un champ unique",
+            content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    public PaiementDTO create(@RequestBody Paiement paiement) {
         return paiementService.create(paiement);
     }
 
     @PutMapping("/{id}")
     @Operation(summary = "Modifier : Paiement")
-    @ApiResponse(responseCode = "404", description = "Paiement introuvable")
-    public Paiement update(@PathVariable Long id, @RequestBody Paiement paiement) {
+    @ApiResponse(responseCode = "200", description = "Paiement modifié(e)")
+    @ApiResponse(responseCode = "404", description = "Paiement introuvable",
+            content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    public PaiementDTO update(@PathVariable Long id, @RequestBody Paiement paiement) {
         return paiementService.update(id, paiement);
     }
 
     @DeleteMapping("/{id}")
     @Operation(summary = "Supprimer : Paiement")
-    @ApiResponse(responseCode = "404", description = "Paiement introuvable")
-    @ApiResponse(responseCode = "409", description = "Élément encore référencé ailleurs")
+    @ApiResponse(responseCode = "200", description = "Paiement supprimé(e)")
+    @ApiResponse(responseCode = "404", description = "Paiement introuvable",
+            content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    @ApiResponse(responseCode = "409", description = "Élément encore référencé ailleurs",
+            content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     public void delete(@PathVariable Long id) {
         paiementService.delete(id);
     }

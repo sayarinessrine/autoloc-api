@@ -1,5 +1,6 @@
 package com.autoloc.api.service;
 
-/** Contrat CRUD complet = lecture + écriture. */
-public interface CrudService<T, ID> extends ReadService<T, ID>, WriteService<T, ID> {
+/** CRUD complet : T = entité, D = DTO de réponse, ID = type de l'identifiant. */
+public interface CrudService<T, D, ID>
+        extends ReadService<D, ID>, WriteService<T, D, ID>, EntityFinder<T, ID> {
 }
